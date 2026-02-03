@@ -25,8 +25,13 @@ int main() {
         if (event.command.get_command_name() == "ping") {
             try
             {
+                if (ws_latency >= 1000.0) {
+                    rc::warn("High WebSocket latency detected: " + std::to_string(ws_latency) + " ms");
+                }
                 event.reply("Pong!\nLatency: " + std::to_string(ws_latency) + " ms");
                 rc::success("Replied to /ping command.");
+                rc::info("WebSocket Latency: " + std::to_string(ws_latency) + " ms");
+
             }
             catch(const std::exception& e)
             {
@@ -41,9 +46,11 @@ int main() {
         rc::success("Bot is ready. Registering slash commands...");
 
         dpp::slashcommand ping_cmd("ping", "Replies with Pong!", bot.me.id);
+        dpp::slashcommand talk("talk", "Make the bot say whatever the coder wants.", bot.me.id);
         bot.global_command_create(ping_cmd);
-
+        bot.global_command_create(talk);
         rc::success("Slash commands registered.");
+        rc::success("Bot is online as " + bot.me.username);
     });
 
     
