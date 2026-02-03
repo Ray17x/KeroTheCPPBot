@@ -45,12 +45,14 @@ namespace FFmpegWrap {
 
         static void convert(const fs::path& inputPath, const std::unordered_set<std::uint16_t>& bitrate, const std::unordered_set<std::string_view>& codec);
 
-        inline void ValidateAudioFile(const fs::path& filePath) {
+        inline bool ValidateAudioFile(const fs::path& filePath) {
             if (!fs::exists(filePath)) {
                 throw std::invalid_argument("File does not exist: " + filePath.string());
+                return false;
             }
             if (!fs::is_regular_file(filePath)) {
                 throw std::invalid_argument("Path is not a regular file: " + filePath.string());
+                return false;
             }
 
             std::string ext = filePath.extension().string(); // includes leading '.'
@@ -59,6 +61,7 @@ namespace FFmpegWrap {
             }
             if (ext.empty()) {
                 throw std::invalid_argument("File has no extension: " + filePath.string());
+                return false;
             }
 
             std::transform(ext.begin(), ext.end(), ext.begin(),
@@ -67,6 +70,8 @@ namespace FFmpegWrap {
             if (codec_set.find(ext) == codec_set.end()) {
                 throw std::invalid_argument("Unsupported audio extension: " + ext);
             }
+
+            return true;
         }
     };
 
@@ -127,5 +132,5 @@ namespace FFmpegWrap {
     };
 }
 
-
+FFmpegWrap::FPUtil FPutility;
 #endif // ffmpegwrapping_hpp #ifndef end
